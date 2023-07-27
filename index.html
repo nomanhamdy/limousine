@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>خدمات ليموزين</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f3f3f3;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        div.container {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #777;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        div#bookingDetails {
+            margin-top: 20px;
+            display: none; /* Initially hide the booking details */
+        }
+
+        div#bookingDetails.show {
+            display: block; /* Show the booking details when needed */
+        }
+
+        div#bookingDetails h3 {
+            color: #007bff;
+        }
+
+        div#bookingDetails p {
+            color: #555;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>مرحبا بك في خدمات ليموزين</h1>
+    
+    <div class="container">
+        <h2>احجز الأن</h2>
+        <label for="from">من:</label>
+        <input type="text" id="from" required>
+        
+        <label for="to">إلى:</label>
+        <input type="text" id="to" required>
+        
+        <label for="date">التاريخ:</label>
+        <input type="date" id="date" required>
+        
+        <label for="time">الوقت:</label>
+        <input type="time" id="time" required>
+        
+        <button onclick="bookLimousine()">تأكيد الحجز</button>
+    </div>
+    
+    <div id="bookingDetails">
+        <!-- This div will be populated with booking details after submitting the form -->
+    </div>
+    
+    <script>
+        function bookLimousine() {
+            const from = document.getElementById("from").value;
+            const to = document.getElementById("to").value;
+            const date = document.getElementById("date").value;
+            const time = document.getElementById("time").value;
+
+            // In a real implementation, you can perform validations and calculations here
+
+            // For this simplified example, we'll just display the booking details
+            const bookingDetails = `
+                <h3>تفاصيل الحجز</h3>
+                <p>من: ${from}</p>
+                <p>إلى: ${to}</p>
+                <p>التاريخ: ${date}</p>
+                <p>الوقت: ${time}</p>
+                <p>شكرا لحجزك معنا!</p>
+            `;
+
+            // Save the booking details to local storage
+            localStorage.setItem("bookingDetails", bookingDetails);
+
+            // Display the booking details
+            document.getElementById("bookingDetails").innerHTML = bookingDetails;
+            document.getElementById("bookingDetails").classList.add("show"); // Show the booking details
+
+            // Send the booking details to the server for receipt generation
+            const xhr = new XMLHttpRequest();
+            const url = "generate_receipt.php"; // Change this to the URL of your PHP script
+            const params = `from=${from}&to=${to}&date=${date}&time=${time}`;
+
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    // Response from the server (receipt details)
+                    const receiptDetails = xhr.responseText;
+                    document.getElementById("bookingDetails").innerHTML = receiptDetails;
+                }
+            };
+
+            xhr.send(params);
+        }
+
+        // On page load, check if there are previously booked details and display them
+        window.onload = function () {
+            const storedBookingDetails = localStorage.getItem("bookingDetails");
+            if (storedBookingDetails) {
+                document.getElementById("bookingDetails").innerHTML = storedBookingDetails;
+                document.getElementById("bookingDetails").classList.add("show"); // Show the booking details
+            }
+        };
+    </script>
+</body>
+</html>
